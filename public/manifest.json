@@ -1,0 +1,12 @@
+{
+    "name": "2004Scape Extension",
+    "description": "2004Scape Features",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": ["activeTab", "scripting", "storage"],
+    "host_permissions": ["*://*.lostcity.rs/*"],
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "icon.png"
+    }
+}
