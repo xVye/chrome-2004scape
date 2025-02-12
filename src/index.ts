@@ -212,8 +212,15 @@ async function accountLogin(id: number): Promise<void> {
             active: true,
             currentWindow: true
         });
+
         if (!tab || !tab.id) {
             console.error('No active tab found.');
+            return;
+        }
+
+        const allowed = /^https?:\/\/([^.]+\.)?lostcity\.rs(\/|$)/.test(tab.url || '');
+        if (!allowed) {
+            alert('This extension only works on *.lostcity.rs');
             return;
         }
 
