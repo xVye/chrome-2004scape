@@ -105,28 +105,33 @@ function updateAccounts(): void {
     });
 }
 
-function loadWorlds(): void {
+async function loadWorlds(): Promise<void> {
     for (const world of worlds) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
         a.textContent = world.toString();
+        a.classList.add('bold');
 
-        a.addEventListener('click', async () => {
-            // Get current url
-            const [tab] = await chrome.tabs.query({
-                active: true,
-                currentWindow: true
-            });
+        // Get current url
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        });
 
+        const currentUrl = new URL(tab.url || '');
+        if (currentUrl.searchParams.get('world') === world.toString()) {
+            a.style.color = 'red';
+            a.style.cursor = 'default';
+        }
+
+        a.addEventListener('click', () => {
             if (!tab || !tab.url) {
                 window.close();
                 return;
             }
 
-            const currentUrl = new URL(tab.url || '');
             if (currentUrl.searchParams.get('world') === world.toString()) {
-                window.close();
                 return;
             }
 
@@ -438,6 +443,6 @@ function base64ToBuffer(base64: string): ArrayBuffer {
     }
 
     await loadAccounts();
-    loadWorlds();
+    await loadWorlds();
     updateState();
 })();

@@ -65,6 +65,10 @@ li {
     margin: 5px 0;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 /* Account related */
 .account-page {
     display: flex;
