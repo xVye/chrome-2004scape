@@ -112,8 +112,27 @@ function loadWorlds(): void {
         a.href = '#';
         a.textContent = world.toString();
 
-        a.addEventListener('click', () => {
-            chrome.tabs.update({ url: toWorldUrl(world) });
+        a.addEventListener('click', async () => {
+            // Get current url
+            const [tab] = await chrome.tabs.query({
+                active: true,
+                currentWindow: true
+            });
+
+            if (!tab || !tab.url) {
+                window.close();
+                return;
+            }
+
+            const currentUrl = new URL(tab.url || '');
+            if (currentUrl.searchParams.get('world') === world.toString()) {
+                window.close();
+                return;
+            }
+
+            const url = toWorldUrl(world);
+            chrome.tabs.update({ url });
+            window.close();
         });
 
         li.appendChild(a);
