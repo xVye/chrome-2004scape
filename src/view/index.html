@@ -6,40 +6,49 @@
         <title>2004Scape Extension</title>
     </head>
     <body>
-        <body>
-            <div class="content">
-                <div id="create-account-page" class="create-account">
-                    <div class="account-field">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" id="create-account-username" />
-                    </div>
-                    <div class="account-field">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" id="create-account-password" />
-                    </div>
-                    <div class="account-field flex-row">
-                        <a href="#" id="create-account-save">Save</a>
-                        <a href="#" id="create-account-cancel">Cancel</a>
-                    </div>
-                </div>
-                <div id="delete-account-page" class="delete-account">
-                    <div class="account-field">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" id="delete-account-username" />
-                    </div>
-                    <div class="account-field flex-row">
-                        <a href="#" id="delete-account-delete">Delete</a>
-                        <a href="#" id="delete-account-cancel">Cancel</a>
-                    </div>
-                </div>
-                <ul id="accounts"></ul>
-                <ul id="controls" class="controls">
-                    <li class="control">
-                        <a href="#" id="add-account">Add Account</a>
-                        <a href="#" id="delete-account">Delete Account</a>
-                    </li>
-                </ul>
+        <div class="content">
+            <div id="worlds-component" class="component">
+                <b>Worlds</b>
+                <ul id="worlds" class="flex-row flex-center spacing"></ul>
             </div>
-        </body>
+            
+            <div id="create-account-page" class="account-page">
+                <b>Add Account</b>
+                <div class="account-field">
+                    <label for="create-account-username">Username</label>
+                    <input type="text" name="username" id="create-account-username" />
+                </div>
+                <div class="account-field">
+                    <label for="create-account-password">Password</label>
+                    <input type="password" name="password" id="create-account-password" />
+                </div>
+                <div class="account-field flex-row flex-sb">
+                    <a href="#" id="create-account-save">Save</a>
+                    <a href="#" id="create-account-cancel">Cancel</a>
+                </div>
+            </div>
+            
+            <div id="delete-account-page" class="account-page">
+                <b>Delete Account</b>
+                <div class="account-field">
+                    <label for="delete-account-username">Username</label>
+                    <input type="text" name="username" id="delete-account-username" />
+                </div>
+                <div class="account-field flex-row flex-sb">
+                    <a href="#" id="delete-account-delete">Delete</a>
+                    <a href="#" id="delete-account-cancel">Cancel</a>
+                </div>
+            </div>
+            
+            <div id="accounts-component" class="component">
+                <b>Accounts</b>
+                <ul id="accounts" class="spacing"></ul>
+            </div>
+            
+            <div id="controls" class="controls flex-row flex-sb">
+                <a href="#" id="add-account">Add Account</a>
+                <a href="#" id="delete-account">Delete Account</a>
+            </div>
+        </div>
     </body>
 </html>

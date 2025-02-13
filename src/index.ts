@@ -1,5 +1,8 @@
 import '#/view/style.css';
+import { worlds, toWorldUrl } from '#/util/world';
 
+const worldsComponent = document.getElementById('worlds-component') as HTMLElement;
+const worldsList = document.getElementById('worlds') as HTMLUListElement;
 const createAccountPage = document.getElementById('create-account-page') as HTMLElement;
 const createAccountUsername = document.getElementById('create-account-username') as HTMLInputElement;
 const createAccountPassword = document.getElementById('create-account-password') as HTMLInputElement;
@@ -9,6 +12,7 @@ const deleteAccountPage = document.getElementById('delete-account-page') as HTML
 const deleteAccountUsername = document.getElementById('delete-account-username') as HTMLInputElement;
 const deleteAccountDelete = document.getElementById('delete-account-delete') as HTMLLinkElement;
 const deleteAccountCancel = document.getElementById('delete-account-cancel') as HTMLLinkElement;
+const accountsComponent = document.getElementById('accounts-component') as HTMLElement;
 const accounts = document.getElementById('accounts') as HTMLUListElement;
 const controls = document.getElementById('controls') as HTMLUListElement;
 const addAccount = document.getElementById('add-account') as HTMLLinkElement;
@@ -101,6 +105,22 @@ function updateAccounts(): void {
     });
 }
 
+function loadWorlds(): void {
+    for (const world of worlds) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = world.toString();
+
+        a.addEventListener('click', () => {
+            chrome.tabs.update({ url: toWorldUrl(world) });
+        });
+
+        li.appendChild(a);
+        worldsList.appendChild(li);
+    }
+}
+
 function updateState(): void {
     if (accountsList.length === 0) {
         state.page = 'create_account';
@@ -110,18 +130,24 @@ function updateState(): void {
         case 'default':
             createAccountPage.style.display = 'none';
             deleteAccountPage.style.display = 'none';
+            worldsComponent.style.display = 'flex';
+            accountsComponent.style.display = 'flex';
             accounts.style.display = 'flex';
             controls.style.display = 'flex';
             break;
         case 'create_account':
             createAccountPage.style.display = 'flex';
             deleteAccountPage.style.display = 'none';
+            worldsComponent.style.display = 'none';
+            accountsComponent.style.display = 'none';
             accounts.style.display = 'none';
             controls.style.display = 'none';
             break;
         case 'delete_account':
             createAccountPage.style.display = 'none';
             deleteAccountPage.style.display = 'flex';
+            worldsComponent.style.display = 'none';
+            accountsComponent.style.display = 'none';
             accounts.style.display = 'none';
             controls.style.display = 'none';
             break;
@@ -393,5 +419,6 @@ function base64ToBuffer(base64: string): ArrayBuffer {
     }
 
     await loadAccounts();
+    loadWorlds();
     updateState();
 })();
