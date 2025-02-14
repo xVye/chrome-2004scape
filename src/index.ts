@@ -1,5 +1,5 @@
 import '#/view/style.css';
-import { worlds, toWorldUrl } from '#/util/world';
+import { worlds, toWorldUrl, fetchWorlds, loadCachedWorlds, World } from '#/util/world';
 
 const worldsComponent = document.getElementById('worlds-component') as HTMLElement;
 const worldsList = document.getElementById('worlds') as HTMLUListElement;
@@ -105,12 +105,18 @@ function updateAccounts(): void {
     });
 }
 
-async function loadWorlds(): Promise<void> {
-    for (const world of worlds) {
+async function loadWorlds(fetchedWorlds: World[] | undefined): Promise<void> {
+    if (!fetchedWorlds) {
+        return;
+    }
+
+    const tempWorldList = worldsList.cloneNode(true) as HTMLUListElement;
+    
+    for (const world of fetchedWorlds) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
-        a.textContent = world.toString();
+        a.textContent = world.id.toString();
         a.classList.add('bold');
 
         // Get current url
@@ -120,7 +126,7 @@ async function loadWorlds(): Promise<void> {
         });
 
         const currentUrl = new URL(tab.url || '');
-        if (currentUrl.searchParams.get('world') === world.toString()) {
+        if (currentUrl.searchParams.get('world') === world.id.toString()) {
             a.style.color = 'red';
             a.style.cursor = 'default';
         }
@@ -131,18 +137,20 @@ async function loadWorlds(): Promise<void> {
                 return;
             }
 
-            if (currentUrl.searchParams.get('world') === world.toString()) {
+            if (currentUrl.searchParams.get('world') === world.id.toString()) {
                 return;
             }
 
-            const url = toWorldUrl(world);
+            const url = toWorldUrl(world.id);
             chrome.tabs.update({ url });
             window.close();
         });
 
         li.appendChild(a);
-        worldsList.appendChild(li);
+        tempWorldList.appendChild(li);
     }
+
+    worldsList.replaceWith(tempWorldList);
 }
 
 function updateState(): void {
@@ -442,7 +450,17 @@ function base64ToBuffer(base64: string): ArrayBuffer {
         await generateAESPassword();
     }
 
-    await loadAccounts();
-    await loadWorlds();
-    updateState();
+    try {
+        await loadAccounts();
+        await loadCachedWorlds();
+        await loadWorlds(Array.from(worlds.values()));
+
+        fetchWorlds()
+            .then(async fetchedWorlds => await loadWorlds(fetchedWorlds))
+            .catch(err => console.error('Failed to load worlds:', err));
+
+        updateState();
+    } catch (err) {
+        throw new Error(`${err}`);
+    }
 })();
