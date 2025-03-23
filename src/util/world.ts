@@ -30,7 +30,7 @@ export async function loadCachedWorlds(): Promise<void> {
                     return reject();
                 }
 
-                const cachedWorlds: World[] = result[WORLDS_CACHE_KEY];
+                const cachedWorlds: World[] = result[WORLDS_CACHE_KEY].sort((a: World, b: World) => a.id - b.id);
 
                 worlds.clear();
                 totalPlayers = 0;
@@ -54,7 +54,7 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        const fetchedWorlds: World[] = [];
+        let fetchedWorlds: World[] = [];
 
         const tables = doc.querySelectorAll('table > tbody > tr > td > table');
         for (const table of tables) {
@@ -90,7 +90,8 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                 });
             }
         }
-        
+
+        fetchedWorlds = fetchedWorlds.sort((a, b) => a.id - b.id);
         await saveWorlds(fetchedWorlds);
         return fetchedWorlds;
     } catch (err) {
