@@ -118,10 +118,13 @@ input {
 /* World specific */
 #worlds {
     gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
 #worlds li {
     height: auto;
+    width: 19px !important;
 }
 
 /* Button style */
