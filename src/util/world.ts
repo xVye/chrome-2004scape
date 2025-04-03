@@ -4,6 +4,7 @@ const WORLDS_CACHE_KEY: string = '2004scape_worlds';
 
 export interface World {
     id: number;
+    member: boolean;
     playerCount: number;
 }
 
@@ -55,10 +56,19 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
         const doc = parser.parseFromString(html, 'text/html');
 
         let fetchedWorlds: World[] = [];
+        totalPlayers = 0;
 
-        const tables = doc.querySelectorAll('table > tbody > tr > td > table');
-        for (const table of tables) {
-            const rows = table.querySelectorAll('tr');
+        const worldSections = doc.querySelectorAll('table[width="500"] > tbody > tr > td');
+        for (const section of worldSections) {
+            const headerText = section.querySelector('b')?.textContent?.trim();
+            const isMember = headerText?.includes('p2p') || false;
+
+            const worldTable = section.querySelector('table');
+            if (!worldTable) {
+                continue;
+            }
+
+            const rows = worldTable.querySelectorAll('tr');
             for (const row of rows) {
                 const link = row.querySelector('a');
                 if (!link) {
@@ -71,11 +81,15 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                 }
 
                 const world = parseInt(match[1], 10);
+                if (fetchedWorlds.some(w => w.id === world)) {
+                    continue;
+                }
+
                 const players = row.querySelector('td:last-child');
                 if (!players) {
                     continue;
                 }
-                
+
                 const playersMatch = players.textContent?.trim().match(/(\d+)\s*players/);
                 if (!playersMatch) {
                     continue;
@@ -84,12 +98,56 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                 const playerCount = parseInt(playersMatch[1], 10);
                 totalPlayers += playerCount;
 
+                console.log(`World ${world} (${isMember ? 'P2P' : 'F2P'}): ${playerCount} players`);
+
                 fetchedWorlds.push({
                     id: world,
-                    playerCount,
+                    member: isMember,
+                    playerCount
                 });
             }
         }
+
+        // for (const table of tables) {
+        //     const membertext = table.querySelector('b');
+        //     const member = (membertext && membertext.textContent?.trim().match(/\s*p2p/)) != null;
+        //     // const tables = parentTable.querySelectorAll('tbody > tr > td > table');
+
+        //     const rows = table.querySelectorAll('tr');
+        //     for (const row of rows) {
+        //         const link = row.querySelector('a');
+        //         if (!link) {
+        //             continue;
+        //         }
+
+        //         const match = link.href.match(/world=(\d+)/);
+        //         if (!match) {
+        //             continue;
+        //         }
+
+        //         const world = parseInt(match[1], 10);
+        //         const players = row.querySelector('td:last-child');
+        //         if (!players) {
+        //             continue;
+        //         }
+
+        //         const playersMatch = players.textContent?.trim().match(/(\d+)\s*players/);
+        //         if (!playersMatch) {
+        //             continue;
+        //         }
+
+        //         const playerCount = parseInt(playersMatch[1], 10);
+        //         totalPlayers += playerCount;
+
+        //         console.log(`World ${world} (${member ? 'P2P' : 'F2P'}): ${playerCount} players`);
+
+        //         fetchedWorlds.push({
+        //             id: world,
+        //             member,
+        //             playerCount
+        //         });
+        //     }
+        // }
 
         fetchedWorlds = fetchedWorlds.sort((a, b) => a.id - b.id);
         await saveWorlds(fetchedWorlds);

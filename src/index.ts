@@ -2,7 +2,8 @@ import '#/view/style.css';
 import { worlds, toWorldUrl, fetchWorlds, loadCachedWorlds, World } from '#/util/world';
 
 const worldsComponent = document.getElementById('worlds-component') as HTMLElement;
-const worldsList = document.getElementById('worlds') as HTMLUListElement;
+const worldListF2P = document.getElementById('worlds-f2p') as HTMLUListElement;
+const worldListP2P = document.getElementById('worlds-p2p') as HTMLUListElement;
 const createAccountPage = document.getElementById('create-account-page') as HTMLElement;
 const createAccountUsername = document.getElementById('create-account-username') as HTMLInputElement;
 const createAccountPassword = document.getElementById('create-account-password') as HTMLInputElement;
@@ -110,7 +111,8 @@ async function loadWorlds(fetchedWorlds: World[] | undefined): Promise<void> {
         return;
     }
 
-    const tempWorldList = worldsList.cloneNode(true) as HTMLUListElement;
+    const tempWorldListF2P = worldListF2P.cloneNode(true) as HTMLUListElement;
+    const tempWorldListP2P = worldListP2P.cloneNode(true) as HTMLUListElement;
     
     for (const world of fetchedWorlds) {
         const li = document.createElement('li');
@@ -147,10 +149,16 @@ async function loadWorlds(fetchedWorlds: World[] | undefined): Promise<void> {
         });
 
         li.appendChild(a);
-        tempWorldList.appendChild(li);
+        if (world.member) {
+            tempWorldListP2P.appendChild(li);
+        }
+        else {
+            tempWorldListF2P.appendChild(li);
+        }
     }
 
-    worldsList.replaceWith(tempWorldList);
+    worldListF2P.replaceWith(tempWorldListF2P);
+    worldListP2P.replaceWith(tempWorldListP2P);
 }
 
 function updateState(): void {
