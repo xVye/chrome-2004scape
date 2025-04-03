@@ -2,8 +2,18 @@ import '#/view/style.css';
 import { worlds, toWorldUrl, fetchWorlds, loadCachedWorlds, World } from '#/util/world';
 
 const worldsComponent = document.getElementById('worlds-component') as HTMLElement;
+const headerF2P = document.getElementById('header-f2p') as HTMLHeadingElement;
+const headerP2P = document.getElementById('header-p2p') as HTMLHeadingElement;
+
 const worldListF2P = document.getElementById('worlds-f2p') as HTMLUListElement;
 const worldListP2P = document.getElementById('worlds-p2p') as HTMLUListElement;
+
+const settingsPage = document.getElementById('settings-page') as HTMLElement;
+const settingsToggleF2P = document.getElementById('toggle-f2p-worlds') as HTMLInputElement;
+const settingsToggleP2P = document.getElementById('toggle-p2p-worlds') as HTMLInputElement;
+const settingsSave = document.getElementById('settings-save') as HTMLLinkElement;
+const settingsCancel = document.getElementById('settings-cancel') as HTMLLinkElement;
+
 const createAccountPage = document.getElementById('create-account-page') as HTMLElement;
 const createAccountUsername = document.getElementById('create-account-username') as HTMLInputElement;
 const createAccountPassword = document.getElementById('create-account-password') as HTMLInputElement;
@@ -18,10 +28,22 @@ const accounts = document.getElementById('accounts') as HTMLUListElement;
 const controls = document.getElementById('controls') as HTMLUListElement;
 const addAccount = document.getElementById('add-account') as HTMLLinkElement;
 const deleteAccount = document.getElementById('delete-account') as HTMLLinkElement;
+const openSettings = document.getElementById('open-settings') as HTMLLinkElement;
 
 let AES_PASSWORD: string | null = null;
 const AES_STORAGE_KEY: string = '2004scape_aes';
 const LOCAL_STORAGE_KEY: string = '2004scape_accounts';
+const SETTINGS_STORAGE_KEY: string = '2004scape_settings';
+
+interface Settings {
+    enableF2P: boolean;
+    enableP2P: boolean;
+}
+
+const settings: Settings = {
+    enableF2P: true,
+    enableP2P: true,
+};
 
 interface EncryptedData {
     iv: string;
@@ -34,7 +56,7 @@ interface Account {
     salt: string;
 }
 
-type Page = 'default' | 'create_account' | 'delete_account';
+type Page = 'default' | 'settings' | 'create_account' | 'delete_account';
 interface State {
     page: Page;
 }
@@ -168,6 +190,7 @@ function updateState(): void {
 
     switch (state.page) {
         case 'default':
+            settingsPage.style.display = 'none';
             createAccountPage.style.display = 'none';
             deleteAccountPage.style.display = 'none';
             worldsComponent.style.display = 'flex';
@@ -175,7 +198,17 @@ function updateState(): void {
             accounts.style.display = 'flex';
             controls.style.display = 'flex';
             break;
+        case 'settings':
+            settingsPage.style.display = 'flex';
+            createAccountPage.style.display = 'none';
+            deleteAccountPage.style.display = 'none';
+            worldsComponent.style.display = 'none';
+            accountsComponent.style.display = 'none';
+            accounts.style.display = 'none';
+            controls.style.display = 'none';
+            break;
         case 'create_account':
+            settingsPage.style.display = 'none';
             createAccountPage.style.display = 'flex';
             deleteAccountPage.style.display = 'none';
             worldsComponent.style.display = 'none';
@@ -184,6 +217,7 @@ function updateState(): void {
             controls.style.display = 'none';
             break;
         case 'delete_account':
+            settingsPage.style.display = 'none';
             createAccountPage.style.display = 'none';
             deleteAccountPage.style.display = 'flex';
             worldsComponent.style.display = 'none';
@@ -192,7 +226,25 @@ function updateState(): void {
             controls.style.display = 'none';
             break;
     }
+    headerF2P.hidden = !settings.enableF2P;
+    headerP2P.hidden = !settings.enableP2P;
 }
+
+openSettings.addEventListener('click', () => {
+    state.page = 'settings';
+    loadSettings();
+    updateState();
+});
+
+settingsSave.addEventListener('click', () => {
+    saveSettings();
+});
+
+settingsCancel.addEventListener('click', () => {
+    state.page = 'default';
+    loadSettings();
+    updateState();
+});
 
 addAccount.addEventListener('click', () => {
     state.page = 'create_account';
@@ -219,6 +271,37 @@ createAccountCancel.addEventListener('click', () => {
     createAccountPassword.value = '';
     updateState();
 });
+
+function loadSettings(): void {
+    chrome.storage.sync.get(SETTINGS_STORAGE_KEY, data => {
+        if (!data[SETTINGS_STORAGE_KEY]) {
+            return;
+        }
+
+        const storedSettings = data[SETTINGS_STORAGE_KEY] as Settings;
+        settings.enableF2P = storedSettings.enableF2P;
+        settings.enableP2P = storedSettings.enableP2P;
+        settingsToggleF2P.checked = settings.enableF2P;
+        settingsToggleP2P.checked = settings.enableP2P;
+        headerF2P.hidden = !settings.enableF2P;
+        headerP2P.hidden = !settings.enableP2P;
+    });
+}
+
+function saveSettings(): void {
+    const settings = {
+        enableF2P: settingsToggleF2P.checked,
+        enableP2P: settingsToggleP2P.checked,
+    };
+
+    chrome.storage.sync.set({ [SETTINGS_STORAGE_KEY]: settings }, () => {
+        console.log('Settings saved:', settings);
+    });
+
+    state.page = 'default';
+    loadSettings();
+    updateState();
+}
 
 async function saveAccount(): Promise<void> {
     const username = createAccountUsername.value;
@@ -459,6 +542,7 @@ function base64ToBuffer(base64: string): ArrayBuffer {
     }
 
     try {
+        loadSettings();
         await loadAccounts();
         await loadCachedWorlds();
         await loadWorlds(Array.from(worlds.values()));

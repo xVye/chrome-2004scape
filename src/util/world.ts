@@ -98,8 +98,6 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                 const playerCount = parseInt(playersMatch[1], 10);
                 totalPlayers += playerCount;
 
-                console.log(`World ${world} (${isMember ? 'P2P' : 'F2P'}): ${playerCount} players`);
-
                 fetchedWorlds.push({
                     id: world,
                     member: isMember,

@@ -8,12 +8,30 @@
     <body>
         <div class="content">
             <div id="worlds-component" class="component">
-                <!-- <b>Worlds</b>
-                <ul id="worlds" class="flex-row flex-center spacing"></ul> -->
-                <b>Free-to-play</b>
-                <ul id="worlds-f2p" class="flex-row flex-center spacing worlds"></ul>
-                <b>Pay-to-play</b>
-                <ul id="worlds-p2p" class="flex-row flex-center spacing worlds"></ul>
+                <section id="header-f2p">
+                    <b>Free-to-play</b>
+                    <ul id="worlds-f2p" class="flex-row flex-center spacing worlds"></ul>
+                </section>
+                <section id="header-p2p">
+                    <b>Pay-to-play</b>
+                    <ul id="worlds-p2p" class="flex-row flex-center spacing worlds"></ul>
+                </section>
+            </div>
+
+            <div id="settings-page" class="account-page">
+                <b>Settings</b>
+                <div class="component flex-row">
+                    <label for="toggle-f2p-worlds">Show free-to-play worlds:</label>
+                    <input type="checkbox" name="toggle-f2p-worlds" id="toggle-f2p-worlds" checked />
+                </div>
+                <div class="component flex-row">
+                    <label for="toggle-p2p-worlds">Show pay-to-play worlds:</label>
+                    <input type="checkbox" name="toggle-p2p-worlds" id="toggle-p2p-worlds" checked />
+                </div>
+                <div class="account-field flex-row flex-sb">
+                    <a href="#" id="settings-save">Save</a>
+                    <a href="#" id="settings-cancel">Cancel</a>
+                </div>
             </div>
             
             <div id="create-account-page" class="account-page">
@@ -52,6 +70,7 @@
             <div id="controls" class="controls flex-row flex-sb">
                 <a href="#" id="add-account">Add Account</a>
                 <a href="#" id="delete-account">Delete Account</a>
+                <a href="#" id="open-settings">Settings</a>
             </div>
         </div>
     </body>
