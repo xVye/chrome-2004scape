@@ -406,7 +406,7 @@ function injectKeyEvent(user: string, pass: string): void {
             );
         }
 
-        canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: '13' }));
+        canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', code: '9' }));
 
         for (let i = 0; i < password.length; i++) {
             canvas.dispatchEvent(
