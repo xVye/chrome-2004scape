@@ -50,8 +50,8 @@ export async function loadCachedWorlds(): Promise<void> {
 
 export async function fetchWorlds(): Promise<World[] | undefined> {
     try {
-        const resposne = await fetch('https://2004.lostcity.rs/serverlist?hires.x=101&hires.y=41&method=0');
-        const html = await resposne.text();
+        const response = await fetch('https://2004.lostcity.rs/serverlist?hires.x=101&hires.y=41&method=0');
+        const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
@@ -149,6 +149,7 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
 
         fetchedWorlds = fetchedWorlds.sort((a, b) => a.id - b.id);
         await saveWorlds(fetchedWorlds);
+        console.log(fetchedWorlds);
         return fetchedWorlds;
     } catch (err) {
         console.error('Failed to load worlds:', err);

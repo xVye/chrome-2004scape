@@ -130,6 +130,7 @@ function updateAccounts(): void {
 
 async function loadWorlds(fetchedWorlds: World[] | undefined): Promise<void> {
     if (!fetchedWorlds) {
+        console.error('Tried to load empty worlds.');
         return;
     }
 
@@ -323,7 +324,7 @@ async function saveAccount(): Promise<void> {
 
     state.page = 'default';
 
-    await loadAccounts();
+    await loadAccounts().catch(console.error);
     updateState();
 }
 
@@ -346,7 +347,7 @@ async function removeAccount(): Promise<void> {
     chrome.storage.sync.set({ [LOCAL_STORAGE_KEY]: accountsList });
 
     state.page = 'default';
-    await loadAccounts();
+    await loadAccounts().catch(console.error);
     updateState();
 }
 
@@ -543,9 +544,9 @@ function base64ToBuffer(base64: string): ArrayBuffer {
 
     try {
         loadSettings();
-        await loadAccounts();
-        await loadCachedWorlds();
-        await loadWorlds(Array.from(worlds.values()));
+        await loadAccounts().catch(console.error);
+        await loadCachedWorlds().catch(console.error);
+        await loadWorlds(Array.from(worlds.values())).catch(console.error);
 
         fetchWorlds()
             .then(async fetchedWorlds => await loadWorlds(fetchedWorlds))
