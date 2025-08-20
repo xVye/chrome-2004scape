@@ -90,7 +90,7 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                     continue;
                 }
 
-                const playersMatch = players.textContent?.trim().match(/(\d+)\s*players/);
+                const playersMatch = players.textContent?.trim().match(/(\d+)\s*player\s*/);
                 if (!playersMatch) {
                     continue;
                 }
@@ -105,47 +105,6 @@ export async function fetchWorlds(): Promise<World[] | undefined> {
                 });
             }
         }
-
-        // for (const table of tables) {
-        //     const membertext = table.querySelector('b');
-        //     const member = (membertext && membertext.textContent?.trim().match(/\s*p2p/)) != null;
-        //     // const tables = parentTable.querySelectorAll('tbody > tr > td > table');
-
-        //     const rows = table.querySelectorAll('tr');
-        //     for (const row of rows) {
-        //         const link = row.querySelector('a');
-        //         if (!link) {
-        //             continue;
-        //         }
-
-        //         const match = link.href.match(/world=(\d+)/);
-        //         if (!match) {
-        //             continue;
-        //         }
-
-        //         const world = parseInt(match[1], 10);
-        //         const players = row.querySelector('td:last-child');
-        //         if (!players) {
-        //             continue;
-        //         }
-
-        //         const playersMatch = players.textContent?.trim().match(/(\d+)\s*players/);
-        //         if (!playersMatch) {
-        //             continue;
-        //         }
-
-        //         const playerCount = parseInt(playersMatch[1], 10);
-        //         totalPlayers += playerCount;
-
-        //         console.log(`World ${world} (${member ? 'P2P' : 'F2P'}): ${playerCount} players`);
-
-        //         fetchedWorlds.push({
-        //             id: world,
-        //             member,
-        //             playerCount
-        //         });
-        //     }
-        // }
 
         fetchedWorlds = fetchedWorlds.sort((a, b) => a.id - b.id);
         await saveWorlds(fetchedWorlds);
